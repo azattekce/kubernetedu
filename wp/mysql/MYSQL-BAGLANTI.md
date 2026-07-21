@@ -9,7 +9,7 @@
 - **Database**: wp_db
 - **Root Password**: wproot
 - **User**: burak
-- **User Password**: admin
+- **User Password**: ?
 
 ## 🔌 Bağlantı Yöntemleri
 

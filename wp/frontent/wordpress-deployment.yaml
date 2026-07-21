@@ -13,7 +13,10 @@ spec:
       app: wordpress
       tier: frontend
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   template:
     metadata:
       labels:
@@ -23,9 +26,10 @@ spec:
       containers:
       - name: wordpress
         image: wordpress:latest
+        imagePullPolicy: IfNotPresent
         env:
         - name: WORDPRESS_DB_HOST
-          value: wordpress-mysql
+          value: wordpress-mysql:3306
         - name: WORDPRESS_DB_NAME
           value: wp_db
         - name: WORDPRESS_DB_USER
@@ -41,6 +45,27 @@ spec:
         volumeMounts:
         - name: wordpress-persistent-storage
           mountPath: /var/www/html
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
       volumes:
       - name: wordpress-persistent-storage
         persistentVolumeClaim:
