@@ -1,0 +1,33 @@
+# ============================================
+# NGINX PERSISTENT VOLUME CLAIM TANIMI
+# ============================================
+# Kubernetes API versiyonu
+apiVersion: v1
+# Kaynak türü: PersistentVolumeClaim (Depolama talebi)
+kind: PersistentVolumeClaim
+# PVC metaverileri
+metadata:
+  # PVC adı
+  name: nginx-dev-pv-claim
+  # PVC'nin oluşturulacağı ad alanı (deployment ile aynı namespace olmalı!)
+  namespace: azdevops
+  # PVC etiketleri
+  labels:
+    app: nginx-dev-pod
+    component: storage
+  # PVC açıklamaları
+  annotations:
+    description: "Nginx development storage claim"
+# PVC belirtimi
+spec:
+  # Depolama sınıfı adı
+  storageClassName: standard
+  # Erişim modları
+  accessModes:
+    - ReadWriteOnce  # Tek bir node tarafından read-write olarak mount edilebilir
+  # Volume modu
+  volumeMode: Filesystem
+  # Kaynak talepleri
+  resources:
+    requests:
+      storage: 3Gi  # Talep edilen depolama alanı

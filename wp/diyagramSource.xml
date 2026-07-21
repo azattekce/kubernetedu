@@ -1,0 +1,82 @@
+graph TB
+    subgraph "🌐 External Access"
+        Browser["🌐 Tarayıcı<br/>localhost:8082"]
+        phpMyAdmin["🔧 phpMyAdmin<br/>localhost:8080<br/>(Docker)"]
+    end
+
+    subgraph "🔄 Port Forwarding"
+        PF1["Port-Forward<br/>8082 → 80"]
+        PF2["Port-Forward<br/>3307 → 3306"]
+    end
+
+    subgraph "☸️ Kubernetes Cluster - Namespace: wp"
+        subgraph "📡 Services"
+            WP_SVC["🌐 wordpress<br/>NodePort<br/>80:30080/TCP"]
+            MYSQL_SVC["🔒 wordpress-mysql<br/>ClusterIP<br/>3306/TCP"]
+        end
+
+        subgraph "🚀 Deployments & Pods"
+            subgraph "WordPress Deployment"
+                WP_POD1["📦 wordpress-pod-1<br/>Running<br/>Image: wordpress:latest"]
+                WP_POD2["📦 wordpress-pod-2<br/>Running<br/>Image: wordpress:latest"]
+            end
+            
+            subgraph "MySQL Deployment"
+                MYSQL_POD["💾 wordpress-mysql<br/>Running<br/>Image: mysql:5.6"]
+            end
+        end
+
+        subgraph "💽 Storage (PersistentVolumeClaims)"
+            WP_PVC["📂 wp-pv-claim<br/>10Gi<br/>ReadWriteOnce<br/>Status: Bound"]
+            MYSQL_PVC["📂 mysql-pv-claim<br/>20Gi<br/>ReadWriteOnce<br/>Status: Bound"]
+        end
+
+        subgraph "🔐 Secrets"
+            SECRET["🔑 mysql-pass<br/>password: admin"]
+        end
+    end
+
+    subgraph "🖥️ Minikube Node"
+        NODE["📍 minikube<br/>IP: 192.168.49.2<br/>NodePort: 30080"]
+    end
+
+    %% External connections
+    Browser --> PF1
+    phpMyAdmin --> PF2
+    PF1 --> WP_SVC
+    PF2 --> MYSQL_SVC
+    NODE --> WP_SVC
+
+    %% Service to Pod connections
+    WP_SVC --> WP_POD1
+    WP_SVC --> WP_POD2
+    MYSQL_SVC --> MYSQL_POD
+
+    %% Pod to Pod connections
+    WP_POD1 -.->|"MySQL Client<br/>wordpress-mysql:3306"| MYSQL_SVC
+    WP_POD2 -.->|"MySQL Client<br/>wordpress-mysql:3306"| MYSQL_SVC
+
+    %% Storage connections
+    WP_POD1 --> WP_PVC
+    WP_POD2 --> WP_PVC
+    MYSQL_POD --> MYSQL_PVC
+
+    %% Secret connections
+    WP_POD1 -.->|"DB Password"| SECRET
+    WP_POD2 -.->|"DB Password"| SECRET
+    MYSQL_POD -.->|"Root Password"| SECRET
+
+    %% Styling
+    classDef external fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef service fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef pod fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef storage fill:#f8bbd0,stroke:#c2185b,stroke-width:2px
+    classDef secret fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef node fill:#e0e0e0,stroke:#424242,stroke-width:2px
+
+    class Browser,phpMyAdmin external
+    class WP_SVC,MYSQL_SVC service
+    class WP_POD1,WP_POD2,MYSQL_POD pod
+    class WP_PVC,MYSQL_PVC storage
+    class SECRET secret
+    class NODE node

@@ -1,0 +1,136 @@
+
+# ============================================
+# NGINX INGRESS TANIMI
+# ============================================
+# Ingress, HTTP/HTTPS trafiğini cluster içindeki servislere yönlendiren bir API nesnesidir.
+# Domain adı ve path tabanlı routing sağlar.
+
+# Kubernetes API versiyonu (Ingress için)
+apiVersion: networking.k8s.io/v1
+# Kaynak türü: Ingress
+kind: Ingress
+# Ingress metaverileri
+metadata:
+  # Ingress adı
+  name: nginx-ingress
+  # Ingress'in dağıtılacağı ad alanı
+  namespace: azatdevops
+  # Ingress etiketleri
+  labels:
+    app: nginx
+    environment: development
+  # Ingress için özel açıklamalar (annotations) - Ingress Controller davranışını kontrol eder
+  annotations:
+    # Ingress Controller sınıfı belirtme (eski yöntem)
+    kubernetes.io/ingress.class: "nginx"
+    # URL yeniden yazma kuralı: path prefix'i kaldırır
+    # Örnek: /app/test -> / olarak backend'e gider
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # SSL yönlendirmesini devre dışı bırak (HTTP'ye izin ver)
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    # İsteğe bağlı: Rate limiting (istek sayısı sınırlama)
+    # nginx.ingress.kubernetes.io/limit-rps: "100"
+    # İsteğe bağlı: CORS ayarları
+    # nginx.ingress.kubernetes.io/enable-cors: "true"
+    # İsteğe bağlı: Client body boyut limiti
+    # nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+
+# Ingress belirtimi
+spec:
+  # İsteğe bağlı: Ingress sınıfı (yeni yöntem - Kubernetes 1.18+)
+  ingressClassName: nginx
+  
+  # Routing kuralları - hangi trafiğin hangi servise gideceğini tanımlar
+  rules:
+  
+  # Kural 1: nginx.local domain'i için
+  - host: nginx.local
+    http:
+      # Path tabanlı yönlendirme kuralları
+      paths:
+      # Ana path: tüm trafik nginx-service'e gider
+      - path: /
+        # Path tipi: Prefix (/ ile başlayan tüm yollar eşleşir)
+        pathType: Prefix
+        # Backend service yapılandırması
+        backend:
+          # Hedef service
+          service:
+            # Service adı (dev-deployment.yml'deki service ile eşleşmeli)
+            name: nginx-service
+            # Service port
+            port:
+              # Port numarası
+              number: 80
+  
+  # İsteğe bağlı Kural 2: www.nginx.local için (yorum satırlarını kaldırarak aktif edin)
+  # - host: www.nginx.local
+  #   http:
+  #     paths:
+  #     - path: /
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: nginx-service
+  #           port:
+  #             number: 80
+  
+  # İsteğe bağlı Kural 3: Path tabanlı routing örneği
+  # - host: app.local
+  #   http:
+  #     paths:
+  #     # /api/* istekleri başka bir servise gider
+  #     - path: /api
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: api-service
+  #           port:
+  #             number: 8080
+  #     # /web/* istekleri başka bir servise gider
+  #     - path: /web
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: web-service
+  #           port:
+  #             number: 3000
+  
+  # İsteğe bağlı: TLS/SSL yapılandırması (HTTPS için)
+  # tls:
+  # - hosts:
+  #   # SSL sertifikası uygulanacak host'lar
+  #   - nginx.local
+  #   - www.nginx.local
+  #   # TLS sertifikası içeren secret adı
+  #   # Secret oluşturma: kubectl create secret tls nginx-tls-secret --cert=cert.pem --key=key.pem -n azatdevops
+  #   secretName: nginx-tls-secret
+
+# ============================================
+# KULLANIM NOTLARI
+# ============================================
+# 
+# 1. Ingress Controller'ı Etkinleştirin:
+#    minikube addons enable ingress
+#    
+# 2. Ingress'i Deploy Edin:
+#    kubectl apply -f Ingress.yml
+#    
+# 3. Durumu Kontrol Edin:
+#    kubectl get ingress -n azatdevops
+#    kubectl describe ingress nginx-ingress -n azatdevops
+#    
+# 4. Hosts Dosyasını Düzenleyin (Windows):
+#    Dosya: C:\Windows\System32\drivers\etc\hosts
+#    Ekle: <MINIKUBE_IP>  nginx.local
+#    Minikube IP: minikube ip
+#    
+# 5. Tarayıcıda Test Edin:
+#    http://nginx.local
+#    
+# 6. Curl ile Test (hosts dosyası olmadan):
+#    curl -H "Host: nginx.local" http://<MINIKUBE_IP>
+#    
+# 7. Ingress'i Silmek İçin:
+#    kubectl delete -f Ingress.yml
+#

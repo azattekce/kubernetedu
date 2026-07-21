@@ -1,0 +1,35 @@
+# ============================================
+# NGINX SERVICE TANIMI (NodePort)
+# ============================================
+# Kubernetes API versiyonu
+apiVersion: v1
+# Kaynak türü: Service
+kind: Service
+# Service metaverileri
+metadata:
+  # Service adı
+  name: nginx-dev-service
+  # Service'in dağıtılacağı ad alanı
+  namespace: azdevops
+  # Service etiketleri
+  labels:
+    app: nginx-dev-pod
+# Service belirtimi
+spec:
+  # Service tipi: NodePort (cluster dışından erişim için)
+  type: NodePort
+  # Hangi pod'lara trafik yönlendirileceğini belirleyen seçici
+  selector:
+    app: nginx-dev-pod
+  # Port tanımları
+  ports:
+  # HTTP port yapılandırması
+  - name: http
+    # Service'in dinleyeceği port (cluster içi)
+    port: 80
+    # Pod'un containerPort'u (hedef port)
+    targetPort: 80
+    # Node üzerinde açılacak port (30000-32767 arası, belirtilmezse otomatik)
+    # nodePort: 30080  # İsteğe bağlı: belirli bir port kullanmak için yorum satırını kaldırın
+    # Protokol türü
+    protocol: TCP

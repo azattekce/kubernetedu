@@ -1,0 +1,95 @@
+
+
+# ============================================
+# NGINX DEPLOYMENT TANIMI
+# ============================================
+# Kubernetes API versiyonu
+apiVersion: apps/v1
+# Kaynak türü: Deployment (Dağıtım)
+kind: Deployment
+# Deployment metaverileri
+metadata:
+  # Deployment adı
+  name: nginx-dev-deployment
+  # Deployment'ın dağıtılacağı ad alanı
+  namespace: azdevops
+# Deployment belirtimi
+spec:
+  # Pod seçici: hangi pod'ların bu deployment'a ait olduğunu belirler
+  selector:
+    matchLabels:
+      app: nginx-dev-pod
+  # Çalışacak pod kopyası sayısı
+  replicas: 3
+  # Rolling update stratejisi
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  # Pod şablonu: oluşturulacak pod'ların yapılandırması
+  template:
+    # Pod metaverileri
+    metadata:
+      # Pod etiketleri
+      labels:
+        app: nginx-dev-pod
+    # Pod belirtimi
+    spec:
+      # Volume tanımları
+      volumes:
+      - name: nginx-dev-storage
+        persistentVolumeClaim:
+          claimName: nginx-dev-pv-claim
+      # Init container: Her pod başladığında yeni HTML oluşturur
+      initContainers:
+      - name: install
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          echo '<html><body><h1>Nginx Dev Server - Running!</h1><p>Timestamp: '$(date)'</p></body></html>' > /work-dir/index.html
+          echo "Index.html created with fresh timestamp: $(date)"
+        volumeMounts:
+        - name: nginx-dev-storage
+          mountPath: /work-dir
+      # Konteyner tanımları
+      containers:
+      # Nginx konteyneri
+      - name: nginx-dev
+        # Kullanılacak Docker görüntüsü ve versiyonu
+        image: nginx:1.27
+        # Açığa çıkarılan portlar
+        ports:
+        # HTTP trafiği için 80 portu
+        - containerPort: 80
+          name: http-server
+        # Volume bağlama noktaları
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: nginx-dev-storage
+        # Kaynak limitleri
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        # Sağlık kontrolleri
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+
+

@@ -1,0 +1,16 @@
+# ============================================
+# NAMESPACE TANIMI
+# ============================================
+# Kubernetes API versiyonu
+apiVersion: v1
+# Kaynak türü: Namespace (Ad Alanı)
+kind: Namespace
+# Namespace metaverileri
+metadata:
+  # Namespace adı
+  name: azdevops
+  # Namespace etiketleri
+  labels:
+    name: azdevops
+    environment: development
+---
