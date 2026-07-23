@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-service-config
+  namespace: default
+data:
+  # Application
+  app_name: "Product Management Service"
+  app_version: "1.0.0"
+  api_v1_prefix: "/api/v1"
+
+  # Database (Minikube içindeki MSSQL)
+  database_driver: "mssql+aioodbc"
+  database_host: "mssql-service.default.svc.cluster.local"
+  database_port: "1433"
+  database_name: "ProductManagementDB"
+  database_pool_size: "20"
+  database_max_overflow: "10"
+
+  # Redis (Minikube için local service)
+  redis_host: "redis-service.default.svc.cluster.local"
+  redis_port: "6379"
+  redis_db: "0"
+
+  # Pagination
+  default_page_size: "20"
+  max_page_size: "100"
+
+  # Rate Limiting
+  rate_limit_enabled: "true"
+  rate_limit_per_minute: "100"
+
+  # Observability
+  enable_tracing: "true"
+  enable_metrics: "true"
+  otel_service_name: "product-service"
+  otel_exporter_jaeger_endpoint: "http://jaeger-collector:14268/api/traces"
+
+  # CORS
+  allowed_origins: "http://localhost:3000,https://yourdomain.com"
+  cors_allow_credentials: "true"
