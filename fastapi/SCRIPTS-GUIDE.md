@@ -103,37 +103,7 @@ cd c:\zattekce\Kubernets\Edu\fastapi
 
 ## 🗄️ Database Management Scripts
 
-### 4. **setup-database.ps1**
-
-**İşlevi:** MSSQL pod'unda ProductManagementDB database'ini oluşturur
-
-**Ne Yapar:**
-1. MSSQL pod'unu bulur ve ready olmasını bekler
-2. `ProductManagementDB` database'ini oluşturur (IF NOT EXISTS)
-3. Database'in başarıyla oluşturulduğunu doğrular
-4. Application pod'larını restart eder
-
-**Kullanım:**
-```powershell
-.\setup-database.ps1
-```
-
-**SQL Komutu:**
-```sql
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'ProductManagementDB')
-BEGIN
-    CREATE DATABASE ProductManagementDB;
-END
-```
-
-**Ne Zaman Kullanılır:**
-- İlk deployment'tan sonra
-- Database'i yanlışlıkla sildiyseniz
-- MSSQL pod'unu yeniden başlattıktan sonra
-
----
-
-### 5. **run-migrations.ps1**
+### 4. **run-migrations.ps1**
 
 **İşlevi:** Alembic database migrations çalıştırır (Schema oluşturma)
 
@@ -163,7 +133,7 @@ alembic upgrade head  # Son versiyona upgrade
 
 ---
 
-### 6. **reset-mssql.ps1**
+### 5. **reset-mssql.ps1**
 
 **İşlevi:** MSSQL'i PVC (Persistent Volume Claim) dahil tamamen sıfırlar
 
@@ -192,7 +162,7 @@ alembic upgrade head  # Son versiyona upgrade
 
 ---
 
-### 7. **wait-for-mssql.ps1**
+### 6. **wait-for-mssql.ps1**
 
 **İşlevi:** MSSQL'in tam hazır olmasını bekler ve database oluşturur
 
@@ -226,7 +196,7 @@ alembic upgrade head  # Son versiyona upgrade
 
 ## 🌐 Port Forwarding Scripts
 
-### 8. **port-forward.ps1**
+### 7. **port-forward.ps1**
 
 **İşlevi:** localhost:8080'den FastAPI uygulamasına erişim sağlar
 
@@ -252,7 +222,7 @@ alembic upgrade head  # Son versiyona upgrade
 
 ---
 
-### 9. **port-forward-mssql.ps1**
+### 8. **port-forward-mssql.ps1**
 
 **İşlevi:** localhost:1433'ten MSSQL'e SQL Server Management Studio (SSMS) bağlantısı sağlar
 
@@ -271,7 +241,7 @@ alembic upgrade head  # Son versiyona upgrade
 - **Server name:** `localhost,1433` (veya `127.0.0.1,1433`)
 - **Authentication:** SQL Server Authentication
 - **Login:** `sa`
-- **Password:** `Az.123456+`
+- **Password:** `?`
 - **Encryption:** Optional (veya Trust server certificate)
 - **Database:** ProductManagementDB
 
@@ -283,64 +253,9 @@ alembic upgrade head  # Son versiyona upgrade
 
 ---
 
-## 🔄 Utility Scripts
+## � Utility Scripts
 
-### 10. **rollback-to-minikube-sql.ps1**
-
-**İşlevi:** Host makinedeki SQL Server'dan Minikube içindeki SQL Server'a geri döner
-
-**Ne Yapar:**
-1. ConfigMap'i Minikube SQL için günceller (`mssql-service.default.svc.cluster.local`)
-2. Secret'ı günceller
-3. MSSQL deployment'ını başlatır (scale 1)
-4. MSSQL pod'unun hazır olmasını bekler
-5. ProductManagementDB oluşturur
-6. Application pod'larını restart eder
-7. Durumu gösterir
-
-**Kullanım:**
-```powershell
-.\rollback-to-minikube-sql.ps1
-```
-
-**Ne Zaman Kullanılır:**
-- Host SQL Server'a bağlanamadığınızda
-- Host SQL Server yapılandırması karmaşık olduğunda
-- Minikube içindeki SQL tercih edildiğinde
-- Development için self-contained ortam istediğinizde
-
-**Değişen Ayarlar:**
-```yaml
-# Önceden (Host SQL)
-database_host: "host.minikube.internal"
-
-# Sonradan (Minikube SQL)
-database_host: "mssql-service.default.svc.cluster.local"
-```
-
----
-
-## 🔧 Diğer Utility Scripts
-
-### **connect-host-sqlserver.ps1**
-
-**İşlevi:** Host makinedeki SQL Server'a bağlanmak için yapılandırma yapar
-
-**Ne Yapar:**
-1. Minikube içindeki MSSQL pod'unu kapatır (scale 0)
-2. ConfigMap'i host SQL için günceller
-3. Host SQL Server'da database oluşturmayı dener (sqlcmd varsa)
-4. Application pod'larını restart eder
-5. Migrations çalıştırır
-
-**Kullanım:**
-```powershell
-.\connect-host-sqlserver.ps1
-```
-
----
-
-### **diagnose-sqlserver.ps1**
+### 9. **diagnose-sqlserver.ps1**
 
 **İşlevi:** Host SQL Server sorunlarını teşhis eder
 
@@ -413,6 +328,16 @@ database_host: "mssql-service.default.svc.cluster.local"
 # 1. Ana deployment (TLS sorun yoksa)
 .\deploy-to-minikube.ps1
 
+---
+
+## 📋 Script Kullanım Sırası
+
+### 🆕 İlk Deployment
+
+```powershell
+# 1. Ana deployment (TLS sorun yoksa)
+.\deploy-to-minikube.ps1
+
 # VEYA TLS sorunu varsa
 .\deploy-offline.ps1
 
@@ -449,13 +374,14 @@ database_host: "mssql-service.default.svc.cluster.local"
 ### 🔍 Debug ve Test
 
 ```powershell
-# API test
+# Port forwarding (API)
 .\port-forward.ps1
-# http://localhost:8080/api/v1/docs
 
-# Database erişimi
+# Port forwarding (MSSQL)
 .\port-forward-mssql.ps1
-# SSMS ile localhost,1433
+
+# Host SQL Server diagnostics
+.\diagnose-sqlserver.ps1
 ```
 
 ---
