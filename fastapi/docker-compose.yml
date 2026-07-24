@@ -9,15 +9,18 @@ services:
     container_name: product-service
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - APP_ENV=development
+      - APP_ENV=${APP_ENV:-development}
       - DATABASE_HOST=mssql
       - DATABASE_PORT=1433
-      - DATABASE_NAME=ProductManagementDB
-      - DATABASE_USER=sa
-      - DATABASE_PASSWORD=YourStrongPassword123!
+      - DATABASE_NAME=${DATABASE_NAME:-ProductManagementDB}
+      - DATABASE_USER=${DATABASE_USER:-sa}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
       - mssql
       - redis
@@ -32,9 +35,11 @@ services:
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: product-mssql
+    env_file:
+      - .env
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrongPassword123!
+      - SA_PASSWORD=${DATABASE_PASSWORD}
       - MSSQL_PID=Developer
     ports:
       - "1433:1433"
@@ -43,7 +48,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrongPassword123! -Q "SELECT 1" || exit 1
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $${DATABASE_PASSWORD} -C -Q "SELECT 1" || exit 1
       interval: 10s
       timeout: 5s
       retries: 10
@@ -109,8 +114,10 @@ services:
       - grafana-data:/var/lib/grafana
     networks:
       - app-network
+    env_file:
+      - .env
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
 
 networks:
