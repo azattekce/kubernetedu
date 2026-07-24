@@ -94,12 +94,32 @@ class Settings(BaseSettings):
             return [origin.strip() for origin in v.split(",")]
         return v
 
+    @field_validator("ALLOWED_HOSTS", mode="before")
+    @classmethod
+    def parse_hosts(cls, v):
+        """Parse comma-separated hosts string to list"""
+        if isinstance(v, str):
+            if v == "*":
+                return ["*"]
+            return [host.strip() for host in v.split(",")]
+        return v
+
     @field_validator("CORS_ALLOW_METHODS", mode="before")
     @classmethod
     def parse_methods(cls, v):
         """Parse comma-separated methods string to list"""
         if isinstance(v, str):
             return [method.strip() for method in v.split(",")]
+        return v
+
+    @field_validator("CORS_ALLOW_HEADERS", mode="before")
+    @classmethod
+    def parse_headers(cls, v):
+        """Parse comma-separated headers string to list"""
+        if isinstance(v, str):
+            if v == "*":
+                return ["*"]
+            return [header.strip() for header in v.split(",")]
         return v
 
     @property
