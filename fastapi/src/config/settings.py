@@ -16,6 +16,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
+        # Disable JSON parsing for complex types from env
+        env_parse_none_str="null",
     )
 
     # Application
@@ -27,8 +29,8 @@ class Settings(BaseSettings):
 
     # API Configuration
     API_V1_PREFIX: str = Field(default="/api/v1")
-    ALLOWED_ORIGINS: List[str] = Field(default=["*"])
-    ALLOWED_HOSTS: List[str] = Field(default=["*"])
+    allowed_origins_str: str = Field(default="*", alias="ALLOWED_ORIGINS")
+    allowed_hosts_str: str = Field(default="*", alias="ALLOWED_HOSTS")
 
     # Database Configuration
     DATABASE_DRIVER: str = Field(default="mssql+aioodbc")
@@ -72,8 +74,8 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ALLOW_CREDENTIALS: bool = Field(default=True)
-    CORS_ALLOW_METHODS: List[str] = Field(default=["*"])
-    CORS_ALLOW_HEADERS: List[str] = Field(default=["*"])
+    cors_allow_methods_str: str = Field(default="*", alias="CORS_ALLOW_METHODS")
+    cors_allow_headers_str: str = Field(default="*", alias="CORS_ALLOW_HEADERS")
 
     # Observability
     ENABLE_TRACING: bool = Field(default=True)
@@ -86,40 +88,40 @@ class Settings(BaseSettings):
     HEALTH_CHECK_DB_TIMEOUT: int = Field(default=5)
     HEALTH_CHECK_REDIS_TIMEOUT: int = Field(default=3)
 
-    @field_validator("ALLOWED_ORIGINS", mode="before")
-    @classmethod
-    def parse_origins(cls, v):
-        """Parse comma-separated origins string to list"""
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
+    @property
+    def ALLOWED_ORIGINS(self) -> List[str]:
+        """Parse ALLOWED_ORIGINS from comma-separated string"""
+        if self.allowed_origins_str == "*":
+            return ["*"]
+        return [origin.strip() for origin in self.allowed_origins_str.split(",")]
 
-    @field_validator("ALLOWED_HOSTS", mode="before")
-    @classmethod
-    def parse_hosts(cls, v):
-        """Parse comma-separated hosts string to list"""
-        if isinstance(v, str):
-            if v == "*":
-                return ["*"]
-            return [host.strip() for host in v.split(",")]
-        return v
+    @property
+    def ALLOWED_HOSTS(self) -> List[str]:
+        """Parse ALLOWED_HOSTS from comma-separated string"""
+        if self.allowed_hosts_str == "*":
+            return ["*"]
+        return [host.strip() for host in self.allowed_hosts_str.split(",")]
 
-    @field_validator("CORS_ALLOW_METHODS", mode="before")
-    @classmethod
-    def parse_methods(cls, v):
-        """Parse comma-separated methods string to list"""
-        if isinstance(v, str):
-            return [method.strip() for method in v.split(",")]
-        return v
+    @property
+    def CORS_ALLOW_METHODS(self) -> List[str]:
+        """Parse CORS_ALLOW_METHODS from comma-separated string"""
+        if self.cors_allow_methods_str == "*":
+            return ["*"]
+        return [method.strip() for method in self.cors_allow_methods_str.split(",")]
 
-    @field_validator("CORS_ALLOW_HEADERS", mode="before")
+    @property
+    def CORS_ALLOW_HEADERS(self) -> List[str]:
+        """Parse CORS_ALLOW_HEADERS from comma-separated string"""
+        if self.cors_allow_headers_str == "*":
+            return ["*"]
+        return [header.strip() for header in self.cors_allow_headers_str.split(",")]
+
+    @field_validator("allowed_origins_str", "allowed_hosts_str", "cors_allow_methods_str", "cors_allow_headers_str", mode="before")
     @classmethod
-    def parse_headers(cls, v):
-        """Parse comma-separated headers string to list"""
-        if isinstance(v, str):
-            if v == "*":
-                return ["*"]
-            return [header.strip() for header in v.split(",")]
+    def validate_string_list(cls, v):
+        """Ensure value is string"""
+        if isinstance(v, list):
+            return ",".join(v)
         return v
 
     @property

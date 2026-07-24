@@ -71,6 +71,19 @@ services:
       timeout: 3s
       retries: 5
 
+  # Redis Commander (Optional - Redis UI)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: product-redis-commander
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    networks:
+      - app-network
+    depends_on:
+      - redis
+
   # Jaeger (Optional - for distributed tracing)
   jaeger:
     image: jaegertracing/all-in-one:latest
