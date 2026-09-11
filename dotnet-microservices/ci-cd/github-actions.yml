@@ -1,0 +1,112 @@
+name: order-service-ci-cd
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  IMAGE_NAME: order-service
+  REGISTRY: myregistry.azurecr.io
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Unit Tests
+        run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"
+
+      - name: Dependency Vulnerability Scan (SCA)
+        run: dotnet list package --vulnerable --include-transitive
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  docker-build-push:
+    needs: build-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build image
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} -f src/services/Order/Order.Api/Dockerfile .
+
+      - name: Scan image (Trivy)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
+      - name: Push image
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  deploy-dev:
+    needs: docker-build-push
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: rg-microservices-dev
+          cluster-name: aks-dev
+
+      - name: Deploy to Kubernetes (Dev)
+        run: |
+          kubectl set image deployment/order-service order-service=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} -n dev
+          kubectl rollout status deployment/order-service -n dev
+
+  deploy-prod:
+    needs: docker-build-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production   # GitHub Environment üzerinden manuel onay (required reviewers)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: rg-microservices-prod
+          cluster-name: aks-prod
+
+      - name: Deploy to Kubernetes (Prod - rolling update)
+        run: |
+          kubectl set image deployment/order-service order-service=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} -n prod
+          kubectl rollout status deployment/order-service -n prod
+
+      - name: Smoke test
+        run: curl --fail https://api.mydomain.com/order/health/ready

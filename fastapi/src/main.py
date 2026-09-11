@@ -17,7 +17,7 @@ from src.core.exceptions import AppException
 from src.core.middleware import LoggingMiddleware, RequestIDMiddleware
 from src.infrastructure.cache.redis_client import get_redis_client
 from src.infrastructure.database.session import close_db, init_db
-from src.infrastructure.observability.telemetry import configure_telemetry
+from src.infrastructure.observability.telemetry import configure_telemetry, instrument_app
 
 # Configure structured logging
 configure_logging()
@@ -94,6 +94,10 @@ app.add_middleware(
 # Add custom middleware
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(LoggingMiddleware)
+
+# OpenTelemetry auto-instrumentation must be added before the app starts (not inside lifespan)
+if settings.ENABLE_TRACING:
+    instrument_app(app)
 
 
 # Global exception handler

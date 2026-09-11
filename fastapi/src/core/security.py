@@ -13,8 +13,13 @@ from src.config.settings import get_settings
 logger = structlog.get_logger(__name__)
 settings = get_settings()
 
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Password hashing context with explicit configuration
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__rounds=settings.BCRYPT_ROUNDS,
+    bcrypt__ident="2b"  # Use bcrypt version 2b (handles long passwords better)
+)
 
 
 def hash_password(password: str) -> str:
@@ -25,7 +30,30 @@ def hash_password(password: str) -> str:
     Returns:
         str: Hashed password
     """
-    return pwd_context.hash(password)
+    # Ensure password is encoded as UTF-8 bytes and check length
+    password_bytes = password.encode('utf-8')
+    
+    if len(password_bytes) > 72:
+        logger.warning(
+            "Password truncated to 72 bytes for bcrypt",
+            original_length=len(password_bytes),
+            original_chars=len(password)
+        )
+        # Truncate bytes, not characters
+        password = password_bytes[:72].decode('utf-8', errors='ignore')
+    
+    try:
+        hashed = pwd_context.hash(password)
+        logger.debug("Password hashed successfully", password_length=len(password))
+        return hashed
+    except Exception as e:
+        logger.error(
+            "Password hashing failed",
+            error=str(e),
+            password_length=len(password),
+            exc_info=True
+        )
+        raise ValueError(f"Password hashing failed: {str(e)}")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

@@ -19,7 +19,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     """User creation schema"""
 
-    password: str = Field(..., min_length=8, description="Password")
+    password: str = Field(..., min_length=8, max_length=72, description="Password (max 72 chars due to bcrypt)")
     role: str = Field(default="user", description="User role")
 
     @field_validator("password")
@@ -84,8 +84,8 @@ class TokenRefreshRequest(BaseModel):
 class PasswordChangeRequest(BaseModel):
     """Password change request"""
 
-    current_password: str = Field(..., description="Current password")
-    new_password: str = Field(..., min_length=8, description="New password")
+    current_password: str = Field(..., max_length=72, description="Current password")
+    new_password: str = Field(..., min_length=8, max_length=72, description="New password (max 72 chars)")
 
     @field_validator("new_password")
     @classmethod

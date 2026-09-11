@@ -51,6 +51,11 @@ def configure_telemetry() -> None:
         logger.error("Failed to configure OpenTelemetry", error=str(e))
 
 
+def instrument_app(app) -> None:
+    """Attach OpenTelemetry auto-instrumentation to the FastAPI app so requests emit spans"""
+    FastAPIInstrumentor.instrument_app(app)
+
+
 def get_tracer(name: str):
     """Get tracer instance"""
     return trace.get_tracer(name)

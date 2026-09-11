@@ -54,32 +54,72 @@ class AuthService:
         Raises:
             ConflictException: If username or email already exists
         """
-        # Check if username exists
-        if await self.user_repository.exists_by_username(data.username):
-            raise ConflictException(f"Username '{data.username}' already exists")
+        try:
+            # Check if username exists
+            if await self.user_repository.exists_by_username(data.username):
+                logger.warning(
+                    "Registration failed: username exists",
+                    username=data.username
+                )
+                raise ConflictException(f"Username '{data.username}' already exists")
 
-        # Check if email exists
-        if await self.user_repository.exists_by_email(data.email):
-            raise ConflictException(f"Email '{data.email}' already exists")
+            # Check if email exists
+            if await self.user_repository.exists_by_email(data.email):
+                logger.warning(
+                    "Registration failed: email exists",
+                    email=data.email
+                )
+                raise ConflictException(f"Email '{data.email}' already exists")
 
-        # Hash password
-        hashed_password = hash_password(data.password)
+            # Hash password
+            hashed_password = hash_password(data.password)
 
-        # Create user entity
-        entity = User(
-            username=data.username,
-            email=data.email,
-            hashed_password=hashed_password,
-            full_name=data.full_name,
-            role=data.role,
-        )
+            # Create user entity
+            entity = User(
+                username=data.username,
+                email=data.email,
+                hashed_password=hashed_password,
+                full_name=data.full_name,
+                role=data.role,
+            )
 
-        # Save to database
-        created = await self.user_repository.create(entity)
+            # Save to database
+            created = await self.user_repository.create(entity)
 
-        logger.info("User registered", user_id=created.id, username=created.username)
+            logger.info(
+                "User registered successfully",
+                user_id=str(created.id),
+                username=created.username,
+                role=created.role
+            )
 
-        return self._entity_to_response(created)
+            return self._entity_to_response(created)
+        
+        except ConflictException:
+            # Re-raise ConflictException as-is
+            raise
+        except ValueError as e:
+            # Password validation or other validation errors
+            logger.error(
+                "Registration validation failed",
+                username=data.username,
+                error=str(e),
+                exc_info=True
+            )
+            # Don't expose internal details in production
+            error_msg = "Invalid registration data"
+            if "72 bytes" in str(e) or "72 characters" in str(e):
+                error_msg = "Password is too long (maximum 72 characters)"
+            raise ValueError(error_msg)
+        except Exception as e:
+            logger.error(
+                "Registration failed unexpectedly",
+                username=data.username,
+                error=str(e),
+                error_type=type(e).__name__,
+                exc_info=True
+            )
+            raise
 
     async def login(self, data: UserLogin) -> TokenResponse:
         """
