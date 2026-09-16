@@ -5,6 +5,8 @@ import structlog
 from opentelemetry import trace
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.redis import RedisInstrumentor
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -54,6 +56,27 @@ def configure_telemetry() -> None:
 def instrument_app(app) -> None:
     """Attach OpenTelemetry auto-instrumentation to the FastAPI app so requests emit spans"""
     FastAPIInstrumentor.instrument_app(app)
+
+
+def instrument_sqlalchemy(engine) -> None:
+    """Attach OpenTelemetry instrumentation to the SQLAlchemy engine so DB queries emit spans"""
+    SQLAlchemyInstrumentor().instrument(engine=engine.sync_engine)
+
+
+def instrument_redis() -> None:
+    """Attach OpenTelemetry instrumentation to redis-py so cache calls emit spans"""
+    RedisInstrumentor().instrument()
+
+
+def shutdown_telemetry() -> None:
+    """Flush buffered spans and shut down the tracer provider on app exit"""
+    provider = trace.get_tracer_provider()
+    force_flush = getattr(provider, "force_flush", None)
+    if force_flush:
+        force_flush()
+    shutdown = getattr(provider, "shutdown", None)
+    if shutdown:
+        shutdown()
 
 
 def get_tracer(name: str):

@@ -1,0 +1,192 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting setuptools==69.0.3 (from -r requirements.txt (line 2))
+  Using cached setuptools-69.0.3-py3-none-any.whl.metadata (6.3 kB)
+Collecting fastapi==0.110.0 (from -r requirements.txt (line 3))
+  Using cached fastapi-0.110.0-py3-none-any.whl.metadata (25 kB)
+Collecting uvicorn==0.27.0 (from uvicorn[standard]==0.27.0->-r requirements.txt (line 4))
+  Using cached uvicorn-0.27.0-py3-none-any.whl.metadata (6.4 kB)
+Collecting pydantic==2.6.0 (from -r requirements.txt (line 5))
+  Using cached pydantic-2.6.0-py3-none-any.whl.metadata (81 kB)
+Collecting pydantic-settings==2.1.0 (from -r requirements.txt (line 6))
+  Using cached pydantic_settings-2.1.0-py3-none-any.whl.metadata (2.9 kB)
+Collecting python-dotenv==1.0.1 (from -r requirements.txt (line 7))
+  Using cached python_dotenv-1.0.1-py3-none-any.whl.metadata (23 kB)
+Collecting python-multipart==0.0.9 (from -r requirements.txt (line 8))
+  Using cached python_multipart-0.0.9-py3-none-any.whl.metadata (2.5 kB)
+Collecting email-validator==2.1.0 (from -r requirements.txt (line 9))
+  Using cached email_validator-2.1.0-py3-none-any.whl.metadata (25 kB)
+Collecting sqlalchemy==2.0.25 (from sqlalchemy[asyncio]==2.0.25->-r requirements.txt (line 12))
+  Using cached SQLAlchemy-2.0.25-py3-none-any.whl.metadata (9.6 kB)
+Collecting alembic==1.13.1 (from -r requirements.txt (line 13))
+  Using cached alembic-1.13.1-py3-none-any.whl.metadata (7.4 kB)
+Collecting aioodbc==0.5.0 (from -r requirements.txt (line 14))
+  Using cached aioodbc-0.5.0-py3-none-any.whl.metadata (7.9 kB)
+Collecting pymssql==2.2.11 (from -r requirements.txt (line 15))
+  Using cached pymssql-2.2.11.tar.gz (172 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting asyncpg==0.29.0 (from -r requirements.txt (line 16))
+  Using cached asyncpg-0.29.0.tar.gz (820 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting python-jose==3.3.0 (from python-jose[cryptography]==3.3.0->-r requirements.txt (line 19))
+  Using cached python_jose-3.3.0-py2.py3-none-any.whl.metadata (5.4 kB)
+Requirement already satisfied: passlib==1.7.4 in c:\users\00004740\appdata\local\packages\pythonsoftwarefoundation.python.3.13_qbz5n2kfra8p0\localcache\local-packages\python313\site-packages (from passlib[bcrypt]==1.7.4->-r requirements.txt (line 20)) (1.7.4)
+Collecting bcrypt==4.0.1 (from -r requirements.txt (line 21))
+  Using cached bcrypt-4.0.1-cp36-abi3-win_amd64.whl.metadata (9.0 kB)
+Collecting redis==5.0.1 (from redis[hiredis]==5.0.1->-r requirements.txt (line 24))
+  Using cached redis-5.0.1-py3-none-any.whl.metadata (8.9 kB)
+Collecting structlog==24.1.0 (from -r requirements.txt (line 27))
+  Using cached structlog-24.1.0-py3-none-any.whl.metadata (6.9 kB)
+Collecting opentelemetry-api==1.22.0 (from -r requirements.txt (line 28))
+  Using cached opentelemetry_api-1.22.0-py3-none-any.whl.metadata (1.4 kB)
+Collecting opentelemetry-sdk==1.22.0 (from -r requirements.txt (line 29))
+  Using cached opentelemetry_sdk-1.22.0-py3-none-any.whl.metadata (1.5 kB)
+Collecting opentelemetry-instrumentation-fastapi==0.43b0 (from -r requirements.txt (line 30))
+  Using cached opentelemetry_instrumentation_fastapi-0.43b0-py3-none-any.whl.metadata (2.3 kB)
+Collecting opentelemetry-instrumentation-sqlalchemy==0.43b0 (from -r requirements.txt (line 31))
+  Using cached opentelemetry_instrumentation_sqlalchemy-0.43b0-py3-none-any.whl.metadata (2.3 kB)
+Collecting opentelemetry-instrumentation-redis==0.43b0 (from -r requirements.txt (line 32))
+  Using cached opentelemetry_instrumentation_redis-0.43b0-py3-none-any.whl.metadata (2.2 kB)
+Collecting opentelemetry-exporter-prometheus==0.43b0 (from -r requirements.txt (line 33))
+  Using cached opentelemetry_exporter_prometheus-0.43b0-py3-none-any.whl.metadata (1.8 kB)
+Collecting opentelemetry-exporter-jaeger==1.21.0 (from -r requirements.txt (line 34))
+  Using cached opentelemetry_exporter_jaeger-1.21.0-py3-none-any.whl.metadata (2.2 kB)
+Collecting prometheus-client==0.19.0 (from -r requirements.txt (line 35))
+  Using cached prometheus_client-0.19.0-py3-none-any.whl.metadata (1.8 kB)
+Collecting httpx==0.26.0 (from -r requirements.txt (line 38))
+  Using cached httpx-0.26.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting tenacity==8.2.3 (from -r requirements.txt (line 39))
+  Using cached tenacity-8.2.3-py3-none-any.whl.metadata (1.0 kB)
+Collecting starlette<0.37.0,>=0.36.3 (from fastapi==0.110.0->-r requirements.txt (line 3))
+  Using cached starlette-0.36.3-py3-none-any.whl.metadata (5.9 kB)
+Requirement already satisfied: typing-extensions>=4.8.0 in c:\users\00004740\appdata\local\packages\pythonsoftwarefoundation.python.3.13_qbz5n2kfra8p0\localcache\local-packages\python313\site-packages (from fastapi==0.110.0->-r requirements.txt (line 3)) (4.14.1)
+Requirement already satisfied: annotated-types>=0.4.0 in c:\users\00004740\appdata\local\packages\pythonsoftwarefoundation.python.3.13_qbz5n2kfra8p0\localcache\local-packages\python313\site-packages (from pydantic==2.6.0->-r requirements.txt (line 5)) (0.7.0)
+Collecting pydantic-core==2.16.1 (from pydantic==2.6.0->-r requirements.txt (line 5))
+  Using cached pydantic_core-2.16.1.tar.gz (368 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Installing backend dependencies: started
+  Installing backend dependencies: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+  
+  Preparing metadata (pyproject.toml) did not run successfully.
+  exit code: 1
+  
+  [90 lines of output]
+  Python reports SOABI: cp313-win_amd64
+  Computed rustc target triple: x86_64-pc-windows-msvc
+  Installation directory: C:\Users\00004740\AppData\Local\puccinialin\puccinialin\Cache
+  Downloading rustup-init from https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe
+  Checking for Rust toolchain....
+  Rust not found, installing into a temporary directory
+  Traceback (most recent call last):
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_transports\default.py", line 101, in map_httpcore_exceptions
+      yield
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_transports\default.py", line 250, in handle_request
+      resp = self._pool.handle_request(req)
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+      raise exc from None
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+      response = connection.handle_request(
+          pool_request.request
+      )
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+      raise exc
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+      stream = self._connect(request)
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpcore\_sync\connection.py", line 156, in _connect
+      stream = stream.start_tls(**kwargs)
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpcore\_backends\sync.py", line 154, in start_tls
+      with map_exceptions(exc_map):
+           ~~~~~~~~~~~~~~^^^^^^^^^
+    File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 162, in __exit__
+      self.gen.throw(value)
+      ~~~~~~~~~~~~~~^^^^^^^
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+      raise to_exc(exc) from exc
+  httpcore.ConnectError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1032)
+  
+  The above exception was the direct cause of the following exception:
+  
+  Traceback (most recent call last):
+    File "C:\Users\00004740\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py", line 389, in <module>
+      main()
+      ~~~~^^
+    File "C:\Users\00004740\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py", line 373, in main
+      json_out["return_val"] = hook(**hook_input["kwargs"])
+                               ~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\00004740\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\pip\_vendor\pyproject_hooks\_in_process\_in_process.py", line 175, in prepare_metadata_for_build_wheel
+      return hook(metadata_directory, config_settings)
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\overlay\Lib\site-packages\maturin\__init__.py", line 200, in prepare_metadata_for_build_wheel
+      env = _get_env()
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\overlay\Lib\site-packages\maturin\__init__.py", line 83, in _get_env
+      extra_env = setup_rust()
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\puccinialin\_setup_rust.py", line 143, in setup_rust
+      rustup_init = download_rustup(url, rustup_init, target, file)
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\puccinialin\_setup_rust.py", line 34, in download_rustup
+      response = client.head(url)
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_client.py", line 1111, in head
+      return self.request(
+             ~~~~~~~~~~~~^
+          "HEAD",
+          ^^^^^^^
+      ...<7 lines>...
+          extensions=extensions,
+          ^^^^^^^^^^^^^^^^^^^^^^
+      )
+      ^
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_client.py", line 825, in request
+      return self.send(request, auth=auth, follow_redirects=follow_redirects)
+             ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_client.py", line 914, in send
+      response = self._send_handling_auth(
+          request,
+      ...<2 lines>...
+          history=[],
+      )
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_client.py", line 942, in _send_handling_auth
+      response = self._send_handling_redirects(
+          request,
+          follow_redirects=follow_redirects,
+          history=history,
+      )
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_client.py", line 979, in _send_handling_redirects
+      response = self._send_single_request(request)
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_client.py", line 1014, in _send_single_request
+      response = transport.handle_request(request)
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_transports\default.py", line 249, in handle_request
+      with map_httpcore_exceptions():
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+    File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0\Lib\contextlib.py", line 162, in __exit__
+      self.gen.throw(value)
+      ~~~~~~~~~~~~~~^^^^^^^
+    File "C:\Users\00004740\AppData\Local\Temp\pip-build-env-n4nsxr1p\normal\Lib\site-packages\httpx\_transports\default.py", line 118, in map_httpcore_exceptions
+      raise mapped_exc(message) from exc
+  httpx.ConnectError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1032)
+  [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+
+[notice] A new release of pip is available: 25.3 -> 26.2.1
+[notice] To update, run: C:\Users\00004740\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe -m pip install --upgrade pip
+error: metadata-generation-failed
+
+Encountered error while generating package metadata.
+
+pydantic-core
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.

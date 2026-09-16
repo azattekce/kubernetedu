@@ -16,8 +16,14 @@ from src.config.settings import get_settings
 from src.core.exceptions import AppException
 from src.core.middleware import LoggingMiddleware, RequestIDMiddleware
 from src.infrastructure.cache.redis_client import get_redis_client
-from src.infrastructure.database.session import close_db, init_db
-from src.infrastructure.observability.telemetry import configure_telemetry, instrument_app
+from src.infrastructure.database.session import close_db, engine, init_db
+from src.infrastructure.observability.telemetry import (
+    configure_telemetry,
+    instrument_app,
+    instrument_redis,
+    instrument_sqlalchemy,
+    shutdown_telemetry,
+)
 
 # Configure structured logging
 configure_logging()
@@ -49,6 +55,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Configure telemetry
     if settings.ENABLE_TRACING:
         configure_telemetry()
+        instrument_sqlalchemy(engine)
+        instrument_redis()
         logger.info("Telemetry configured")
 
     logger.info("Application startup complete")
@@ -65,6 +73,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Close Redis connection
     await redis.close()
     logger.info("Redis connection closed")
+
+    # Flush and shut down telemetry so buffered spans aren't lost
+    if settings.ENABLE_TRACING:
+        shutdown_telemetry()
+        logger.info("Telemetry shut down")
 
     logger.info("Application shutdown complete")
 

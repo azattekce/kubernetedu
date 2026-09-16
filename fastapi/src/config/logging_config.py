@@ -5,8 +5,18 @@ import logging
 import sys
 
 import structlog
+from opentelemetry import trace
 
 from src.config.settings import get_settings
+
+
+def add_trace_context(logger, method_name, event_dict):
+    """Inject the current OpenTelemetry trace_id/span_id into log events for correlation"""
+    span_context = trace.get_current_span().get_span_context()
+    if span_context.is_valid:
+        event_dict["trace_id"] = format(span_context.trace_id, "032x")
+        event_dict["span_id"] = format(span_context.span_id, "016x")
+    return event_dict
 
 
 def configure_logging() -> None:
@@ -29,6 +39,7 @@ def configure_logging() -> None:
             structlog.stdlib.add_logger_name,
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
+            add_trace_context,
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
